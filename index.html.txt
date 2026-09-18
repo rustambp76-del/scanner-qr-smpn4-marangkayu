@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Scanner QR - SMP Negeri 4 Marangkayu</title>
+
+  <script src="https://unpkg.com/html5-qrcode"
+          type="text/javascript"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+
+    h2 {
+      color: #1e3a8a;
+      margin-bottom: 5px;
+    }
+
+    .sub {
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    #reader {
+      width: 100%;
+      min-height: 300px;
+      border: 2px solid #1e40af;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    #status {
+      margin-top: 15px;
+      padding: 12px;
+      background: #dbeafe;
+      border-radius: 10px;
+      color: #1e3a8a;
+    }
+
+    #hasil {
+      margin-top: 15px;
+      padding: 15px;
+      background: #dcfce7;
+      border-radius: 10px;
+      color: #166534;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>📷 Scanner QR</h2>
+
+  <div class="sub">
+    SMP NEGERI 4 MARANGKAYU
+  </div>
+
+  <div id="reader"></div>
+
+  <div id="status">
+    📷 Menyiapkan kamera...
+  </div>
+
+  <div id="hasil"></div>
+
+</div>
+
+<script>
+
+let scanner = null;
+let sudahScan = false;
+
+function mulaiScanner() {
+
+  const status = document.getElementById("status");
+
+  console.log("Memulai scanner...");
+
+  scanner = new Html5Qrcode("reader");
+
+  const config = {
+    fps: 10,
+    qrbox: {
+      width: 250,
+      height: 250
+    },
+    aspectRatio: 1.0
+  };
+
+  Html5Qrcode.getCameras()
+
+    .then(function(cameras) {
+
+      console.log("Kamera ditemukan:", cameras);
+
+      if (!cameras || cameras.length === 0) {
+        throw new Error("Kamera tidak ditemukan.");
+      }
+
+      const cameraId = cameras[0].id;
+
+      console.log("Menggunakan kamera:", cameraId);
+
+      return scanner.start(
+        cameraId,
+        config,
+
+        function(decodedText) {
+
+          if (sudahScan) return;
+
+          sudahScan = true;
+
+          console.log("QR TERBACA:", decodedText);
+
+          document.getElementById("hasil").style.display = "block";
+
+          document.getElementById("hasil").innerHTML =
+            "✅ QR TERBACA<br><br>" +
+            decodedText;
+
+          status.innerHTML =
+            "✅ QR berhasil dibaca.";
+
+          scanner.stop();
+
+        },
+
+        function(errorMessage) {
+          console.log("Mencari QR...");
+        }
+      );
+
+    })
+
+    .then(function() {
+
+      console.log("Kamera berhasil dijalankan.");
+
+      status.innerHTML =
+        "📷 Kamera aktif. Arahkan QR Code ke kamera.";
+
+    })
+
+    .catch(function(error) {
+
+      console.error("GAGAL MEMBUKA KAMERA:", error);
+
+      status.innerHTML =
+        "⚠️ Kamera gagal dibuka.<br><br>" +
+        error;
+
+    });
+
+}
+
+window.addEventListener("load", function() {
+  mulaiScanner();
+});
+
+</script>
+
+</body>
+</html>
