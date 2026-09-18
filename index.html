@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Scanner QR - SMP Negeri 4 Marangkayu</title>
 
-  <script src="https://unpkg.com/html5-qrcode"
-          type="text/javascript"></script>
+  <script
+    src="https://unpkg.com/html5-qrcode"
+    type="text/javascript">
+  </script>
 
   <style>
     * {
@@ -23,6 +26,7 @@
     }
 
     .container {
+      width: 100%;
       max-width: 560px;
       margin: auto;
       background: white;
@@ -59,144 +63,295 @@
     }
 
     #hasil {
+      display: none;
       margin-top: 15px;
       padding: 15px;
       background: #dcfce7;
+      border: 1px solid #16a34a;
       border-radius: 10px;
       color: #166534;
       font-weight: bold;
-      display: none;
+      word-break: break-word;
     }
   </style>
+
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-  <h2>📷 Scanner QR</h2>
+    <h2>📷 Scanner QR</h2>
 
-  <div class="sub">
-    SMP NEGERI 4 MARANGKAYU
+    <div class="sub">
+      SMP NEGERI 4 MARANGKAYU
+    </div>
+
+    <div id="reader"></div>
+
+    <div id="status">
+      📷 Menyiapkan kamera...
+    </div>
+
+    <div id="hasil"></div>
+
   </div>
 
-  <div id="reader"></div>
 
-  <div id="status">
-    📷 Menyiapkan kamera...
-  </div>
+  <script>
 
-  <div id="hasil"></div>
+    let scanner = null;
+    let sudahScan = false;
 
-</div>
 
-<script>
+    // ==========================================
+    // MENAMPILKAN HASIL QR
+    // ==========================================
 
-let scanner = null;
-let sudahScan = false;
+    function tampilHasil(text) {
 
-function mulaiScanner() {
+      const hasil = document.getElementById("hasil");
 
-  const status = document.getElementById("status");
+      hasil.style.display = "block";
 
-  console.log("Memulai scanner...");
-
-  scanner = new Html5Qrcode("reader");
-
-  const config = {
-    fps: 10,
-    qrbox: {
-      width: 250,
-      height: 250
-    },
-    aspectRatio: 1.0
-  };
-
-  Html5Qrcode.getCameras()
-
-    .then(function(cameras) {
-
-      console.log("Kamera ditemukan:", cameras);
-
-      if (!cameras || cameras.length === 0) {
-        throw new Error("Kamera tidak ditemukan.");
-      }
-
-      const cameraId = cameras[0].id;
-
-      console.log("Menggunakan kamera:", cameraId);
-return scanner.start(
-  cameraId,
-  config,
-
-  function(decodedText, decodedResult) {
-    if (sudahScan) return;
-
-    sudahScan = true;
-
-    console.log("QR TERBACA:", decodedText);
-
-    if (typeof tampilHasil === "function") {
-      tampilHasil(decodedText);
+      hasil.innerHTML =
+        "✅ QR TERBACA<br><br>" +
+        text;
     }
 
-    fetch("https://script.google.com/macros/s/AKfycbyI6OIqzi1KXVIr3o7jnazc77QYLYn-8UcETydeadypdzsWVmeX-LEpJ2p45lhee8te/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        id: decodedText
-      })
-    })
-    .then(function() {
-      console.log("Data QR berhasil dikirim ke Apps Script.");
-    })
-    .catch(function(error) {
-      console.error("Gagal mengirim QR:", error);
-    });
 
-    scanner.stop()
-      .then(function() {
-        console.log("Scanner dihentikan setelah QR terbaca.");
-      })
-      .catch(function(err) {
-        console.error("Gagal menghentikan scanner:", err);
-      });
-  },
+    // ==========================================
+    // MEMULAI SCANNER
+    // ==========================================
 
-  function(errorMessage) {
-    console.log("Mencari QR:", errorMessage);
-  }
-)
- 
-    .then(function() {
+    function mulaiScanner() {
 
-      console.log("Kamera berhasil dijalankan.");
+      const status = document.getElementById("status");
 
-      status.innerHTML =
-        "📷 Kamera aktif. Arahkan QR Code ke kamera.";
+      console.log("Memulai scanner...");
 
-    })
+      scanner = new Html5Qrcode("reader");
 
-    .catch(function(error) {
 
-      console.error("GAGAL MEMBUKA KAMERA:", error);
+      const config = {
 
-      status.innerHTML =
-        "⚠️ Kamera gagal dibuka.<br><br>" +
-        error;
+        fps: 10,
 
-    });
+        qrbox: {
+          width: 250,
+          height: 250
+        },
 
-}
+        aspectRatio: 1.0
 
-window.addEventListener("load", function() {
-  mulaiScanner();
-});
+      };
 
-</script>
+
+      Html5Qrcode.getCameras()
+
+        .then(function(cameras) {
+
+          console.log(
+            "Kamera ditemukan:",
+            cameras
+          );
+
+
+          if (
+            !cameras ||
+            cameras.length === 0
+          ) {
+
+            throw new Error(
+              "Kamera tidak ditemukan."
+            );
+
+          }
+
+
+          const cameraId =
+            cameras[0].id;
+
+
+          console.log(
+            "Menggunakan kamera:",
+            cameraId
+          );
+
+
+          return scanner.start(
+
+            cameraId,
+
+            config,
+
+
+            // ==================================
+            // QR BERHASIL TERBACA
+            // ==================================
+
+            function(decodedText, decodedResult) {
+
+              if (sudahScan) {
+                return;
+              }
+
+
+              sudahScan = true;
+
+
+              console.log(
+                "QR TERBACA:",
+                decodedText
+              );
+
+
+              // Tampilkan hasil
+              tampilHasil(decodedText);
+
+
+              // =================================
+              // KIRIM DATA KE APPS SCRIPT
+              // =================================
+
+              fetch(
+                "https://script.google.com/macros/s/AKfycbyI6OIqzi1KXVIr3o7jnazc77QYLYn-8UcETydeadypdzsWVmeX-LEpJ2p45lhee8te/exec",
+                {
+
+                  method: "POST",
+
+                  mode: "no-cors",
+
+                  headers: {
+                    "Content-Type":
+                      "text/plain;charset=utf-8"
+                  },
+
+                  body: JSON.stringify({
+
+                    id: decodedText
+
+                  })
+
+                }
+              )
+
+              .then(function() {
+
+                console.log(
+                  "Data QR berhasil dikirim ke Apps Script."
+                );
+
+              })
+
+              .catch(function(error) {
+
+                console.error(
+                  "Gagal mengirim QR:",
+                  error
+                );
+
+              });
+
+
+              // =================================
+              // HENTIKAN SCANNER
+              // =================================
+
+              scanner.stop()
+
+                .then(function() {
+
+                  console.log(
+                    "Scanner dihentikan setelah QR terbaca."
+                  );
+
+                })
+
+                .catch(function(error) {
+
+                  console.error(
+                    "Gagal menghentikan scanner:",
+                    error
+                  );
+
+                });
+
+            },
+
+
+            // ==================================
+            // QR BELUM TERBACA
+            // ==================================
+
+            function(errorMessage) {
+
+              console.log(
+                "Mencari QR:",
+                errorMessage
+              );
+
+            }
+
+          );
+
+        })
+
+
+        // ======================================
+        // KAMERA BERHASIL AKTIF
+        // ======================================
+
+        .then(function() {
+
+          console.log(
+            "Kamera berhasil dijalankan."
+          );
+
+
+          status.innerHTML =
+            "📷 Kamera aktif. " +
+            "Arahkan QR Code ke kamera.";
+
+        })
+
+
+        // ======================================
+        // JIKA KAMERA GAGAL
+        // ======================================
+
+        .catch(function(error) {
+
+          console.error(
+            "GAGAL MEMBUKA KAMERA:",
+            error
+          );
+
+
+          status.innerHTML =
+            "⚠️ Kamera gagal dibuka.<br><br>" +
+            error;
+
+        });
+
+    }
+
+
+    // ==========================================
+    // JALANKAN SAAT HALAMAN DIBUKA
+    // ==========================================
+
+    window.addEventListener(
+      "load",
+      function() {
+
+        mulaiScanner();
+
+      }
+    );
+
+  </script>
 
 </body>
+
 </html>
