@@ -125,12 +125,11 @@ function mulaiScanner() {
       const cameraId = cameras[0].id;
 
       console.log("Menggunakan kamera:", cameraId);
-
-      return scanner.start(
+return scanner.start(
   cameraId,
   config,
 
-  function(decodedText) {
+  function(decodedText, decodedResult) {
     if (sudahScan) return;
 
     sudahScan = true;
@@ -171,6 +170,7 @@ function mulaiScanner() {
     console.log("Mencari QR:", errorMessage);
   }
 )
+ 
     .then(function() {
 
       console.log("Kamera berhasil dijalankan.");
