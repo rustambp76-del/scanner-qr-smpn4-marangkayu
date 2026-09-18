@@ -127,31 +127,50 @@ function mulaiScanner() {
       console.log("Menggunakan kamera:", cameraId);
 
       return scanner.start(
-        cameraId,
-        config,
+  cameraId,
+  config,
 
-        function(decodedText) {
+  function(decodedText) {
+    if (sudahScan) return;
 
-          if (sudahScan) return;
+    sudahScan = true;
 
-          sudahScan = true;
+    console.log("QR TERBACA:", decodedText);
 
-          console.log("QR TERBACA:", decodedText);
+    if (typeof tampilHasil === "function") {
+      tampilHasil(decodedText);
+    }
 
-          if (typeof tampilHasil === 'function') {
-  tampilHasil(decodedText);
-}
+    fetch("https://script.google.com/macros/s/AKfycbyI6OIqzi1KXVIr3o7jnazc77QYLYn-8UcETydeadypdzsWVmeX-LEpJ2p45lhee8te/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify({
+        id: decodedText
+      })
+    })
+    .then(function() {
+      console.log("Data QR berhasil dikirim ke Apps Script.");
+    })
+    .catch(function(error) {
+      console.error("Gagal mengirim QR:", error);
+    });
 
-fetch('https://script.google.com/macros/s/AKfycbyI6OIqzi1KXVIr3o7jnazc77QYLYn-8UcETydeadypdzsWVmeX-LEpJ2p45lhee8te/exec', {
-  method: 'POST',
-  mode: 'no-cors',
-  headers: {
-    'Content-Type': 'text/plain;charset=utf-8'
+    scanner.stop()
+      .then(function() {
+        console.log("Scanner dihentikan setelah QR terbaca.");
+      })
+      .catch(function(err) {
+        console.error("Gagal menghentikan scanner:", err);
+      });
   },
-  body: JSON.stringify({
-    id: decodedText
-  })
-})
+
+  function(errorMessage) {
+    console.log("Mencari QR:", errorMessage);
+  }
+)
 .then(function() {
   console.log('Data QR berhasil dikirim ke Apps Script.');
 })
