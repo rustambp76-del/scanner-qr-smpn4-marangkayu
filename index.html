@@ -138,22 +138,34 @@ function mulaiScanner() {
 
           console.log("QR TERBACA:", decodedText);
 
-          document.getElementById("hasil").style.display = "block";
+          if (typeof tampilHasil === 'function') {
+  tampilHasil(decodedText);
+}
 
-          document.getElementById("hasil").innerHTML =
-            "✅ QR TERBACA<br><br>" +
-            decodedText;
+fetch('https://script.google.com/macros/s/AKfycbyI6OIqzi1KXVIr3o7jnazc77QYLYn-8UcETydeadypdzsWVmeX-LEpJ2p45lhee8te/exec', {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: {
+    'Content-Type': 'text/plain;charset=utf-8'
+  },
+  body: JSON.stringify({
+    id: decodedText
+  })
+})
+.then(function() {
+  console.log('Data QR berhasil dikirim ke Apps Script.');
+})
+.catch(function(error) {
+  console.error('Gagal mengirim QR:', error);
+});
 
-          status.innerHTML =
-            "✅ QR berhasil dibaca.";
-
-          scanner.stop();
-
-        },
-
-        function(errorMessage) {
-          console.log("Mencari QR...");
-        }
+scanner.stop()
+  .then(function() {
+    console.log('Scanner dihentikan setelah QR terbaca.');
+  })
+  .catch(function(err) {
+    console.error('Gagal menghentikan scanner:', err);
+  });
       );
 
     })
