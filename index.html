@@ -171,21 +171,6 @@ function mulaiScanner() {
     console.log("Mencari QR:", errorMessage);
   }
 )
-.then(function() {
-  console.log('Data QR berhasil dikirim ke Apps Script.');
-})
-.catch(function(error) {
-  console.error('Gagal mengirim QR:', error);
-});
-
-scanner.stop()
-  .then(function() {
-    console.log('Scanner dihentikan setelah QR terbaca.');
-  })
-  .catch(function(err) {
-    console.error('Gagal menghentikan scanner:', err);
-  });
-
     .then(function() {
 
       console.log("Kamera berhasil dijalankan.");
