@@ -210,50 +210,30 @@
               tampilHasil(decodedText);
 
 
-              // =================================
+              // =================================================
               // KIRIM DATA KE APPS SCRIPT
-              // ===============================
-==
+              // =================================================
 
-              fetch(
+fetch(
   "https://script.google.com/macros/s/AKfycbwIIdluVMq038qKf6Is6kO_wdKmXhYRrNzRSkmfvNJ5yBLXfw-I0p83n6BVr38P5fML/exec",
   {
-
     method: "POST",
-
     mode: "no-cors",
-
     headers: {
-      "Content-Type":
-        "text/plain;charset=utf-8"
+      "Content-Type": "text/plain;charset=utf-8"
     },
-
     body: JSON.stringify({
-
       id: decodedText,
-      mode: new URLSearchParams(window.location.search).get('mode') || 'DATANG'
-
+      mode: new URLSearchParams(window.location.search).get("mode") || "DATANG"
     })
-
   }
 )
-
-              .then(function() {
-
-                console.log(
-                  "Data QR berhasil dikirim ke Apps Script."
-                );
-
-              })
-
-              .catch(function(error) {
-
-                console.error(
-                  "Gagal mengirim QR:",
-                  error
-                );
-
-              });
+.then(function() {
+  console.log("Data QR berhasil dikirim ke Apps Script.");
+})
+.catch(function(error) {
+  console.error("Gagal mengirim QR:", error);
+});
 
 
               // =================================
