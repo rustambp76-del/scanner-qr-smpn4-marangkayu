@@ -242,22 +242,47 @@ fetch(
 
               scanner.stop()
 
-                .then(function() {
+  .then(function() {
 
-                  console.log(
-                    "Scanner dihentikan setelah QR terbaca."
-                  );
+    console.log(
+      "Scanner dihentikan setelah QR terbaca."
+    );
 
-                })
+    // Tunggu sebentar agar data selesai dikirim,
+    // kemudian aktifkan scanner kembali
+    setTimeout(function() {
 
-                .catch(function(error) {
+      console.log(
+        "Scanner diaktifkan kembali..."
+      );
 
-                  console.error(
-                    "Gagal menghentikan scanner:",
-                    error
-                  );
+      sudahScan = false;
 
-                });
+      document.getElementById("hasil").style.display = "none";
+
+      mulaiScanner();
+
+    }, 2000);
+
+  })
+
+  .catch(function(error) {
+
+    console.error(
+      "Gagal menghentikan scanner:",
+      error
+    );
+
+    // Tetap coba aktifkan kembali scanner
+    setTimeout(function() {
+
+      sudahScan = false;
+
+      mulaiScanner();
+
+    }, 2000);
+
+  });
 
             },
 
