@@ -229,7 +229,12 @@ fetch(
   }
 )
 .then(function() {
-  console.log("Data QR berhasil dikirim ke Apps Script.");
+    console.log("Data QR berhasil dikirim ke Apps Script.");
+
+    // Beritahu dashboard bahwa presensi berhasil
+    if (window.opener && !window.opener.closed) {
+        window.opener.postMessage('PRESENSI_BERHASIL', '*');
+    }
 })
 .catch(function(error) {
   console.error("Gagal mengirim QR:", error);
