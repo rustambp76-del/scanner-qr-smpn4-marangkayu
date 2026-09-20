@@ -110,14 +110,19 @@
 
     function tampilHasil(text) {
 
-      const hasil = document.getElementById("hasil");
+  const hasil = document.getElementById("hasil");
 
-      hasil.style.display = "block";
+  const mode =
+    new URLSearchParams(window.location.search).get("mode")
+    || "DATANG";
 
-      hasil.innerHTML =
-        "✅ QR TERBACA<br><br>" +
-        text;
-    }
+  hasil.style.display = "block";
+
+  hasil.innerHTML =
+    "✅ QR TERBACA<br><br>" +
+    "Mode: <b>" + mode + "</b><br><br>" +
+    text;
+}
 
 
     // ==========================================
